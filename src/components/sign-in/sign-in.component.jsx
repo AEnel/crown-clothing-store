@@ -1,6 +1,7 @@
 import React from "react";
-import FromInput from "../form-input/form-input.component";
+import FormInput from "../form-input/form-input.component";
 import CustomButton from "../custom-button/custom-buttons.component";
+import { auth, signWithGoogle } from "../../firebase/firebase.utils";
 
 import './sign-in.styles.scss'
 
@@ -14,14 +15,21 @@ class SignIn extends React.Component {
     }
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault()
+  handleSubmit = async event => {
+    event.preventDefault();
 
-    this.setState({email: '', password: ''})
+    const {email, password} = this.state;
+
+    try {
+      await auth.signInWithEmailAndPassword(email,password);
+      this.setState({email: '', password: ''});
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  handleChange = (e) => {
-    const { value, name} = e.target;
+  handleChange = event => {
+    const { value, name} = event.target;
 
     this.setState( {[name]: value})
   }
@@ -29,11 +37,11 @@ class SignIn extends React.Component {
   render() {
     return (
     <div className="sign-in">
-      <h2>I already have an account </h2>
+      <h2 >I already have an account </h2>
       <span> Sign in with your email and password </span>
 
       <form onSubmit={this.handleSubmit}>
-        <FromInput
+        <FormInput
             name="email"
             type= 'email'
             label = 'Email'
@@ -42,7 +50,7 @@ class SignIn extends React.Component {
             required
           />
 
-        <FromInput
+        <FormInput
             name="password"
             type= 'password'
             label = 'Password'
@@ -50,8 +58,10 @@ class SignIn extends React.Component {
             value = {this.state.password}
             required
           />
-
+        <div className="buttons" >
         <CustomButton type = 'submit' > Sign in </CustomButton>
+        <CustomButton type = 'button' onClick = {signWithGoogle} isGoogleSignIn = { true } >  Sign in with Google  </CustomButton>
+        </div>
       </form>
     </div>
     )
